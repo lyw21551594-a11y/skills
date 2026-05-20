@@ -1,6 +1,10 @@
 ---
 name: browser-act-skill-forge
 description: "Explores websites via browser-act automation and packages discoveries into callable Skill packages (SKILL.md + scripts) — execute reliably and efficiently without re-exploration. Use when: user wants a reusable Skill for any website ('create/make/build a skill for X'), needs to understand a site's internal APIs ('what endpoint does X use', 'how does X load data'), or requires batch extraction at scale (hundreds+ records — forge a Skill first, then execute reliably). Differs from browser-act: produces reusable packages, not one-off execution. Triggers: 'explore API behind X', 'what endpoint does X use', 'create/forge a skill for [site]', 'build a tool for [site]', 'extract/scrape/crawl N items at scale', 'automate this permanently', 'make this reusable', 'too slow/fragile — package it', 'explore website internals', 'every day/week I have to...', 'monitor [site] for changes', 'browser-act-skill-forge'. Simulated human-operation automation within user's authenticated session."
+metadata:
+  author: BrowserAct
+  version: "1.0.1"
+  homepage: "https://www.browseract.com"
 ---
 
 # browser-act-skill-forge
