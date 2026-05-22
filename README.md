@@ -18,167 +18,121 @@
 
 ---
 
-# 🔥 Help your AI agent finish more browser tasks.
+Browser automation CLI built for AI agents. Break through anti-bot walls, hand off to humans across platforms when stuck. Parallel multi-task execution, independent multi-session operation, isolated multi-account browsing.
 
-A collection of Browser Skills for OPENCLAW-style agents and Skill workflows — built for runs that break on verification, redirects, unstable sessions, or actions that stop working mid-flow.
+## Why BrowserAct
+
+AI agents need more than a headless Chrome wrapper — they need a complete browser automation platform:
+
+**Go where standard tools can't — three-layer anti-blocking, progressively escalating:**
+
+1. **Environment layer** — stealth fingerprints, TLS rotation, proxy switching. Most scenarios resolved here without triggering any challenge.
+2. **Execution layer** — `solve-captcha` auto-solves common CAPTCHAs; `stealth-extract` pulls protected pages in one command, fully unattended.
+3. **Human interaction layer** — `remote-assist` generates a live URL; user opens it on any device to take over. Once done, agent continues seamlessly.
+
+**Concurrent sessions, zero interference:**
+
+- Same-browser multi-session — shared login state, independent execution, tasks don't affect each other
+- Cross-browser multi-session — different browsers operating simultaneously, fully independent
+- Multi-account isolation — each browser has its own fingerprint, proxy, and cookies; websites cannot correlate them
+
+**Three browser types for different scenarios:**
+
+| Type | Use Case | Key Feature |
+|------|----------|-------------|
+| `chrome` | Reuse local Chrome logins | Import Profile, run independently |
+| `chrome-direct` | Control your running Chrome via CDP | Zero config, full extensions + SSO |
+| `stealth` | Anti-detection browsing | Fingerprint spoofing, proxy rotation, batch collection |
+
+All three share the same command interface. Learn one, use all.
+
+**Designed for agent context efficiency:**
+
+- Compact text output, consuming fewer tokens than JSON
+- 50+ commands covering navigation, forms, screenshots, network capture, cookie management
+
+**Security: confirmation gating** — sensitive operations (creating browsers, deletion, importing Profiles) require explicit user approval. No exceptions. Prior approvals do not carry over. Enforced at the Skill layer, not a configuration toggle.
 
 ---
 
-## ❓ What actually happens when most agents hit a real website
+## Install
 
-* The task starts fine — then Cloudflare appears and everything stops
-* The page loads, but clicks stop working halfway through
-* Login works, then the session quietly dies on the next redirect
-* The agent runs for minutes, then returns nothing. Sound familiar?
+Tell your AI agent:
 
-**If any of these have killed your workflow, BrowserAct is for you.**
+> Install browser-act Skill from https://github.com/browser-act/skills/tree/main/browser-act
+
+[Installation details →](docs/installation.md)
 
 ---
 
-## 🎯 Two Ways to Give Your Agent Browser Superpowers
-
-BrowserAct ships two flagship products. Pick the one that fits your problem — or use them together.
-
-### 💻 `browser-act` CLI — Real-time browser control
-
-Drives a real, stealth-capable Chrome from the command line. Your agent navigates, clicks, fills forms, handles captchas, and operates websites just like a human would.
+## Quick Start
 
 ```bash
-npx skills add browser-act/skills --skill browser-act
+# Extract protected page content (zero config)
+browser-act stealth-extract https://example.com
+
+# Full browser automation
+browser-act --session my-task browser open <id> https://example.com
+browser-act --session my-task state          # See clickable elements
+browser-act --session my-task click 3        # Click by index
+browser-act --session my-task input 2 "hi"   # Type into field
 ```
 
-### 🔨 Skill Forge — Turn any website into a reusable Skill
+[More examples and workflows →](docs/quick-start.md)
 
-A meta-Skill that explores a site once, then generates a deploy-ready Skill package (SKILL.md + Python scripts). Every subsequent call skips the exploration cost.
+The agent runs `get-skills` at the start of each session — gets environment state, browser list, and commands in one call:
 
 ```bash
-npx skills add browser-act/skills --skill browser-act-skill-forge
+browser-act get-skills core --skill-version 2.0.2
 ```
 
-### Which one do I need?
-
-| Use `browser-act` CLI when... | Use Skill Forge when... |
-| :--- | :--- |
-| You want the agent to operate a website live | You need to extract or act repeatedly at scale |
-| One-off tasks, ad-hoc browsing | Batch jobs, recurring workflows, zero-maintenance automation |
-| Login flows, captchas, multi-account demos | Hundreds/thousands of records, cross-pagination, recurring monitoring |
+[How agents discover and use BrowserAct →](docs/skills.md)
 
 ---
 
-## 💻 `browser-act` CLI
+## Compatibility
 
-Fast, persistent browser automation from the command line:
+**OS:** Windows, macOS, Linux
 
-```bash
-browser-act navigate https://example.com  # Navigate to URL
-browser-act state                         # See clickable elements
-browser-act click 5                       # Click element by index
-browser-act input 3 "Hello"               # Click and type text
-browser-act screenshot page.png           # Take screenshot
-```
-
-It supports two browser types (Stealth and Real Chrome) and provides scriptable commands for navigation, page interaction, data extraction, and session management.
-
-### ⚡ What makes it different
-
-Most AI agents get blocked by Cloudflare, CAPTCHAs, or login walls. `browser-act` provides the missing infrastructure to let your agent browse like a real human.
-
-| | |
-| :--- | :--- |
-| 🛡️ **Anti-Detection Stealth** | Bypasses Cloudflare, reCAPTCHA, Datadome, and more. Authentic browser fingerprints — your Agent won't get blocked. |
-| 🔗 **Real Chrome Control** | Drive your existing Chrome with all logins, cookies, and extensions. No re-authentication needed. |
-| 🚀 **Parallel Execution** | Run multiple stealth browsers concurrently — each with independent fingerprints, proxies, and sessions. |
-| 🤖 **Captcha Solving** | Built-in automatic captcha solving. No third-party services or manual intervention required. |
-| 📉 **Low Token Noise** | Strips 90% of junk HTML before feeding to the LLM. Save money, get faster answers. |
-| 🔒 **Proxy & Privacy Modes** | Per-browser proxy support (HTTP/SOCKS5) and privacy mode for fresh environments on every launch. |
-
-*These aren't features for edge cases. They're fixes for the exact failures that stop most agents cold.*
+**Agents:** Claude Code · Cursor · VS Code · OpenCode · OpenClaw · Codex · Gemini CLI — works with any agent that can execute shell commands and load Skills.
 
 ---
 
-## 🔨 Skill Forge
+## Documentation
 
-Every time you ask an AI agent to batch-extract from a new website, it starts from scratch — different path each time, different failure modes, unreliable at scale. If the site changes layout, the whole thing breaks.
+Want to understand how BrowserAct works under the hood? Full documentation covers architecture, commands, sessions, stealth, security, and advanced features.
 
-Skill Forge fixes that: **explore once, reuse forever.**
-
-**How it works:**
-
-1. **Describe** — tell the agent the target site and what data to extract or what action to perform
-2. **Explore** — Skill Forge automatically discovers API endpoints (preferred) or DOM patterns
-3. **Generate** — produces deploy-ready Skill files with business parameters extracted as CLI arguments
-4. **Auto-test** — a sub-agent verifies the Skill end-to-end and self-fixes failures until passing
-5. **Deploy & Scale** — run 500 or 5,000 records through the same stable path, anytime
-
-[**View Skill Forge →**](https://github.com/browser-act/skills/tree/main/browser-act-skill-forge)
+[Read the full documentation →](docs/README.md)
 
 ---
 
-## 🚀 Quick Start
+## Also From BrowserAct
 
-### Option A: Live browser control with `browser-act` CLI
+### Skill Forge — Generate a Skill for Any Website
 
-```bash
-npx skills add browser-act/skills --skill browser-act
-```
+Need to extract data from the same website repeatedly at scale? Don't write scrapers by hand. **Skill Forge** explores a site once, discovers its APIs and data patterns, generates a deploy-ready Skill package, then runs reliably without re-exploration — 500 or 5,000 records through the same stable path.
 
-Then tell your agent:
-> *"Go to Amazon.com, find the top 10 best-selling products in the mouse category, and save them to a markdown file."*
+**Any website. Any data. One command to start:**
 
-### Option B: Forge a reusable Skill with Skill Forge
+> Install browser-act-skill-forge Skill from https://github.com/browser-act/skills/tree/main/browser-act-skill-forge
 
-```bash
-npx skills add browser-act/skills --skill browser-act-skill-forge
-```
+Then tell your agent what you need:
 
-Then tell your agent:
-> *"Forge a Skill that extracts job listings from LinkedIn — title, company, salary, URL. I'll run it on 300 keywords later."*
+> *"Forge a Skill that extracts job listings from LinkedIn — title, company, salary, URL."*
 
-Your agent will prompt you to register and get a **free API Key** interactively if it encounters advanced anti-bot protections.
+[Skill Forge documentation →](docs/skill-forge.md)
 
----
+### Solutions Catalog
 
-## ✨ Cross-Platform Compatibility
+30+ pre-built Skills already generated by Skill Forge, ready to install and run. Covers Amazon, Google Maps, YouTube, Reddit, WeChat, Zhihu, and more.
 
-**🚀 Works Seamlessly Across All Major AI Assistants**
+[Browse the full Solutions Catalog →](solutions/README.md)
 
-BrowserAct skills are designed to work **powerfully and reliably** on all leading AI coding platforms:
+### Build Your Own
 
-| Platform | Status | Installation |
-| :--- | :--- | :--- |
-| **Claude Code** | ✅ Fully Supported | Native skill support |
-| **Cursor** | ✅ Fully Supported | Works out of the box |
-| **VS Code** | ✅ Fully Supported | Works out of the box |
-| **OpenCode** | ✅ Fully Supported | Direct integration |
-| **OpenClaw** | ✅ Fully Supported | Compatible |
-| **Codex** | ✅ Fully Supported | Compatible |
-| **Gemini CLI** | ✅ Fully Supported | Compatible |
-
-**Key Benefits:**
-- ✅ **Stable & Reliable:** No crashes, no unexpected behavior.
-- ✅ **Plug & Play:** Works immediately after installation.
-- ✅ **Cross-Platform:** Consistent performance across all AI assistants.
+Can't find what you need above? Generate a custom Skill for **any website** in minutes — no coding required. Just describe what data you want or what action to perform, and Skill Forge handles the rest.
 
 ---
-
-## 📦 Core Skills Catalog
-
-This repository contains ready-to-use scenario skills covering E-commerce scraping, social media monitoring, lead generation, and more. 
-
-Here are some of the highlighted skills you can use right away:
-
-- **Amazon ASIN Lookup Skill**: Extract structured product details from Amazon using ASIN.
-- **Amazon Best Selling Products Finder**: Extract best-selling product data based on keywords.
-- **Google News API Skill**: Track industry trends and breaking news.
-- **Google Maps API Skill**: Scrape local business data and contact info.
-- **YouTube Transcript Extractor**: Extract transcripts and metadata from YouTube videos automatically.
-
-[**Browse all available Skills in the `solutions` directory →**](https://github.com/browser-act/skills/tree/main/solutions)
-
-*Works with any scenario. Can't find what you need? [Join Discord](https://discord.com/invite/UpnCKd7GaU) and request a Skill.*
-
----
-
 
 ## 💖 Support the Project
 
